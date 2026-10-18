@@ -10,7 +10,6 @@ from langchain_core.messages import AIMessage, HumanMessage
 from langgraph.graph import StateGraph, START, END
 
 
-# -------------------------------------- AI Agent Code--------------------------------------
 
 
 def get_text(resp) -> str:
@@ -49,9 +48,9 @@ def prompt_query_context(state: AgentSchema) -> AgentSchema:
 
     obj = DatabaseUtil(conn_details)
 
-    schema_info = obj.schema_details("public")  # Fetch schema details for the 'public' schema
+    schema_info = obj.schema_details("public")  
 
-    # Constructing the prompt query for the agent to generate the SQL query
+    
     prompt = f"""
     You are an SQL analyst agent. Your task is to convert the user's natural language 
     query into Postgres SQL query that can be executed on the database. You are provided 
@@ -107,7 +106,7 @@ def is_safe_sql(state: AgentSchema) -> AgentSchema:
     Here's the SQL query to evaluate:
     {sql_query}"""
 
-    response = llm_judge.invoke(prompt).model_dump()  # Get the structured output as a dictionary
+    response = llm_judge.invoke(prompt).model_dump()  #  output as a dictionary
     state.is_safe = response['answer']
     state.comments = response['comments']
 
@@ -120,7 +119,7 @@ def canceled_sql(state: AgentSchema) -> AgentSchema:
     comments = state.comments
 
     state.final_answer = f"The generated SQL query was deemed unsafe to execute. The reason provided by the judge is: {comments}. Therefore, the SQL query will not be executed."
-    state.messages = state.messages + [AIMessage(content=f"{state.final_answer}")]  # Append the final answer to the messages list  
+    state.messages = state.messages + [AIMessage(content=f"{state.final_answer}")]  
 
     return state
 
@@ -173,7 +172,7 @@ def represent_final_answer(state: AgentSchema) -> AgentSchema:
     return state
 
 
-# ------------------------------------------- Graph Building -------------------------------------------
+#Graph
 
 sql_agent_graph = StateGraph(AgentSchema)
 
@@ -208,8 +207,7 @@ sql_agent_graph.add_conditional_edges("is_safe_sql", is_safe_sql_edge,
                                           "canceled_sql": "canceled_sql"
                                       })
 
-# sql_agent_graph.add_edge("is_safe_sql", "execute_sql")
-# sql_agent_graph.add_edge("is_safe_sql", "canceled_sql")
+
 
 sql_agent_graph.add_edge("canceled_sql", END)
 sql_agent_graph.add_edge("execute_sql", "represent_final_answer")
@@ -241,15 +239,15 @@ if __name__ == "__main__":
 
     # Execute the Graph
     sql_analyst_response = sql_analyst.invoke(input_schema)
-    print(sql_analyst_response['messages'])  # Print the final output of the graph execution
+    print(sql_analyst_response['messages'])  
     print("********************************")
 
-    print(sql_analyst_response['generated_sql_query'])  # Print the generated SQL query
-
-    print("********************************")
-
-    print(sql_analyst_response['sql_query_execution_result'])  # Print the result of executing the SQL query
+    print(sql_analyst_response['generated_sql_query']) 
 
     print("********************************")
 
-    print(sql_analyst_response['prompt_query_context'])  # Print the prompt query context
+    print(sql_analyst_response['sql_query_execution_result']) 
+
+    print("********************************")
+
+    print(sql_analyst_response['prompt_query_context'])  
