@@ -437,12 +437,14 @@ source = { editable = "." }
 dependencies = [
     { name = "langchain" },
     { name = "langgraph" },
+    { name = "pydantic" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "langchain", specifier = ">=1.4.6" },
     { name = "langgraph", specifier = ">=1.2.16" },
+    { name = "pydantic", specifier = ">=2.14.1" },
 ]
 
 [[package]]
