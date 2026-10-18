@@ -132,3 +132,30 @@ def execute_sql(state: AgentSchema) -> AgentSchema:
     state.sql_query_execution_result = execution_result
 
     return state
+
+
+
+# Represent the final answer Node
+def represent_final_answer(state: AgentSchema) -> AgentSchema:
+
+    execution_result = state.sql_query_execution_result
+    curated_question = state.curated_ques
+
+    llm = pick_llm("low")
+
+    prompt = f"""
+    You are an SQL analyst agent. Your task is to provide a final answer to the user based on the
+    execution result of the SQL query and the user's original question. The final answer should be
+    concise, clear, and directly address the user's query. Avoid including any SQL code or technical
+    details in the final answer. The final answer should be in a user-friendly format that is easy to
+    understand. If the execution result is empty or does not provide a clear answer to the user's question, explain this in the final answer. \n
+    Here is the execution result: {execution_result} \n
+    Here is the user's original question: {curated_question}
+    """
+
+    llm_response = llm.invoke(prompt).content  # Get the final answer from the LLM
+
+    state.final_answer = llm_response
+    state.messages = state.messages + [AIMessage(content=f"{llm_response}")]  # Append the final answer to the messages list
+
+    return state
