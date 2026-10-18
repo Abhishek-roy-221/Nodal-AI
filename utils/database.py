@@ -59,22 +59,22 @@ class DatabaseUtil:
         
         return schema_info_context
 
-    # def execute_sql(self, query):
-    #     try:
-    #         connection = self.connection
-    #         cursor = connection.cursor()
-    #         cursor.execute(query)
-    #         result = cursor.fetchall()
-    #         connection.commit()
-    #         return str(result)
-    #     except Exception as e:
-    #         print(f"Error executing query: {e}")
-    #         return None
-    #     finally:
-    #         if cursor:
-    #             cursor.close()
-    #         if connection:
-    #             connection.close()
+    def execute_sql(self, query):
+        try:
+            connection = self.connection
+            cursor = connection.cursor()
+            cursor.execute(query)
+            result = cursor.fetchall()
+            connection.commit()
+            return str(result)
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return None
+        finally:
+            if cursor:
+                cursor.close()
+            if connection:
+                connection.close()
 
 
 obj = DatabaseUtil({
